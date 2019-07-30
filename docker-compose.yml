@@ -7,10 +7,41 @@ services:
     build: 
       context: .
       dockerfile: docker/Dockerfile
+    depends_on:
+      - mysql
+      - redis
     env_file:
       - .docker.env
+    environment: 
+      CONTAINER_ROLE: app
     ports:
       - 8080:80
+    volumes:
+      - .:/var/www/html
+  scheduler:
+    image: laravel-app
+    container_name: laravel-scheduler
+    depends_on:
+      - app
+      - mysql 
+      - redis
+    env_file:
+      - .docker.env
+    environment: 
+      CONTAINER_ROLE: scheduler
+    volumes:
+      - .:/var/www/html
+  queue:
+    image: laravel-app
+    container_name: laravel-queue
+    depends_on:
+      - app
+      - mysql 
+      - redis
+    env_file:
+      - .docker.env
+    environment: 
+      CONTAINER_ROLE: queue
     volumes:
       - .:/var/www/html
   mysql:
